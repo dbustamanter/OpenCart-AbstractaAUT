@@ -37,7 +37,7 @@ public class DriverManager {
                 FirefoxOptions firefoxOptions = new FirefoxOptions();
                 firefoxOptions.setBinary(firefoxBinary);
                 firefoxOptions.addArguments("--headless");
-                driver = new FirefoxDriver();
+                driver = new FirefoxDriver(firefoxOptions);
                 break;
             case Edge:
                 WebDriverManager.edgedriver().setup();
