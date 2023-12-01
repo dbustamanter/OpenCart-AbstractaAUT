@@ -1,5 +1,5 @@
 package constants;
 
 public enum Navegador {
-    Chrome,Firefox,Edge
+    Chrome,Firefox,ChromeGrid,FirefoxGrid,EdgeGrid
 }
