@@ -5,8 +5,10 @@ import io.github.bonigarcia.wdm.WebDriverManager;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
+import org.openqa.selenium.firefox.FirefoxBinary;
 import org.openqa.selenium.firefox.FirefoxDriver;
 import org.openqa.selenium.edge.EdgeDriver;
+import org.openqa.selenium.firefox.FirefoxOptions;
 
 public class DriverManager {
     private static WebDriver driver;
@@ -31,6 +33,10 @@ public class DriverManager {
                 break;
             case Firefox:
                 WebDriverManager.firefoxdriver().setup();
+                FirefoxBinary firefoxBinary = new FirefoxBinary();
+                FirefoxOptions firefoxOptions = new FirefoxOptions();
+                firefoxOptions.setBinary(firefoxBinary);
+                firefoxOptions.addArguments("--headless");
                 driver = new FirefoxDriver();
                 break;
             case Edge:
