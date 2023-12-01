@@ -20,7 +20,7 @@ public class Hooks {
     @Before
     public void beforeClass(Scenario scenario){
         this.scenario =scenario;
-        DriverContext.setUpDriver(Navegador.ChromeGrid);
+        DriverContext.setUpDriver(Navegador.Chrome);
     }
     @AfterStep
     public void capturarEvidencia() throws Exception{
