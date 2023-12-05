@@ -1,0 +1,408 @@
+{
+	"info": {
+		"_postman_id": "c591f51b-376f-404b-a511-ab285c3e6de1",
+		"name": "Abstracta demo API",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "24488024"
+	},
+	"item": [
+		{
+			"name": "Crear usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"usuario creado exitosamente\", function () {\r",
+							"    var urlRequest = pm.variables.get(\"baseURL\") + \"/user/\" + pm.collectionVariables.get(\"username\");\r",
+							"    pm.sendRequest(urlRequest, function (err, response) {\r",
+							"        let respuesta = response.json();\r",
+							"        pm.expect(respuesta.firstName).to.eql(pm.collectionVariables.get(\"firstName\"));\r",
+							"        pm.expect(respuesta.lastName).to.eql(pm.collectionVariables.get(\"lastName\"));\r",
+							"    });\r",
+							"    console.log(\"usuario creado correctamente\");\r",
+							"});\r",
+							"postman.setNextRequest(\"LogIn usuario\");"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"pm.collectionVariables.set(\"random_ID\", _.random(100,200));"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [
+					{
+						"key": "api_key",
+						"value": "special-key",
+						"type": "text"
+					}
+				],
+				"body": {
+					"mode": "raw",
+					"raw": "[\r\n  {\r\n    \"id\": {{random_ID}},\r\n    \"username\": \"{{username}}\",\r\n    \"firstName\": \"{{firstName}}\",\r\n    \"lastName\": \"{{lastName}}\",\r\n    \"email\": \"mail@deprueba.com\",\r\n    \"password\": \"{{password}}\",\r\n    \"phone\": \"912345678\",\r\n    \"userStatus\": 0\r\n  }\r\n]",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/createWithList",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"createWithList"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LogIn usuario",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"LogIn exitoso\", function () {\r",
+							"    pm.response.to.have.status(200);\r",
+							"    let response = pm.response.json();\r",
+							"    var id = response.message.substring(23);\r",
+							"    console.log(\"Sesión iniciada correctamente - ID Sesion: \" + id);\r",
+							"});\r",
+							"postman.setNextRequest(\"Listar mascotas disponibles\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/user/login?username={{username}}&password={{password}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"login"
+					],
+					"query": [
+						{
+							"key": "username",
+							"value": "{{username}}"
+						},
+						{
+							"key": "password",
+							"value": "{{password}}"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Listar mascotas disponibles",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"registros devueltos corresponden solo a estados disponible\", function () {\r",
+							"    let response = pm.response.json();\r",
+							"    var cantidadDisponibles = 0;\r",
+							"    var idsDisponibles = [];\r",
+							"    // Recorrer elementos para identificar si todos los listados se encuentran en estado available\r",
+							"    response.forEach((mascota) => {\r",
+							"        if (mascota.status == \"available\") {\r",
+							"            cantidadDisponibles++;\r",
+							"            let mascotaID = mascota.id;\r",
+							"            idsDisponibles.push(mascotaID);\r",
+							"        }\r",
+							"    });\r",
+							"    pm.expect(cantidadDisponibles).to.eql(response.length);\r",
+							"    console.log(\"Recuento exitoso, mascotas retornadas: \" + response.length + \" | Mascotas disponibles: \" + cantidadDisponibles);\r",
+							"    // Seteo idAleatorio para posterior consulta desde variable entorno\r",
+							"    let idAleatorio;\r",
+							"    do {\r",
+							"        idAleatorio = idsDisponibles[Math.floor(Math.random() * idsDisponibles.length)];\r",
+							"    } while (idAleatorio.toString().length > 5);\r",
+							"    pm.collectionVariables.set(\"mascota_ID\", idAleatorio.toFixed());\r",
+							"});\r",
+							"\r",
+							"postman.setNextRequest(\"Consultar mascota por ID\");\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [
+					{
+						"key": "Content-Type",
+						"value": "application/json",
+						"type": "text"
+					}
+				],
+				"url": {
+					"raw": "{{baseURL}}/pet/findByStatus?status=available",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"pet",
+						"findByStatus"
+					],
+					"query": [
+						{
+							"key": "status",
+							"value": "available"
+						}
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Consultar mascota por ID",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validez estado mascota\", function () {\r",
+							"    var estadoMascota = pm.response.json().status;\r",
+							"    switch (estadoMascota) {\r",
+							"        case \"available\":\r",
+							"            pm.expect(estadoMascota).to.eql(\"available\");\r",
+							"            break;\r",
+							"        case \"pending\":\r",
+							"            pm.expect(estadoMascota).to.eql(\"pending\");\r",
+							"            break;\r",
+							"        case \"sold\":\r",
+							"            pm.expect(estadoMascota).to.eql(\"sold\");\r",
+							"            break;\r",
+							"        default:\r",
+							"        console.log(\"el estado de la mascota consultada no corresponde al formato\");\r",
+							"        pm.expect(estadoMascota).to.eql(\"error\");\r",
+							"    }\r",
+							"});\r",
+							"\r",
+							"postman.setNextRequest(\"Ingresar orden de compra mascota\");"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"protocolProfileBehavior": {
+				"disableBodyPruning": true
+			},
+			"request": {
+				"method": "GET",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/pet/{{mascota_ID}}",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"pet",
+						"{{mascota_ID}}"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Ingresar orden de compra mascota",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"exec": [
+							"var fechaActual = new Date();\r",
+							"var fechaISO = fechaActual.toISOString()\r",
+							"pm.collectionVariables.set(\"fechaOrdenMascota\", fechaISO);"
+						],
+						"type": "text/javascript"
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"verificar creación de orden\", function () {\r",
+							"    let response = pm.response.text();\r",
+							"    const regex = /\"(\\w*id\\w*)\"\\s*:\\s*(\\d+)(,|\\})/g;\r",
+							"    const jsonStringModified = response.replace(regex, '\"$1\": \"$2\"$3');\r",
+							"    response = JSON.parse(jsonStringModified);\r",
+							"    let url = \"https://petstore.swagger.io/v2/store/order/\" + response.id;\r",
+							"    console.log(url);\r",
+							"    pm.sendRequest(url, function (err, response) {\r",
+							"        let respuesta = response.json();\r",
+							"        pm.expect(respuesta.petId).to.eql(parseInt(pm.collectionVariables.get(\"mascota_ID\")));\r",
+							"        pm.expect(new Date(respuesta.shipDate).toISOString()).to.eql(pm.collectionVariables.get(\"fechaOrdenMascota\"));\r",
+							"        pm.expect(respuesta.status).to.eql(\"placed\");\r",
+							"    });\r",
+							"});\r",
+							"\r",
+							"postman.setNextRequest(\"LogOut usuarios\");\r",
+							"\r",
+							""
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "raw",
+					"raw": "{\r\n  \"id\": 0,\r\n  \"petId\": {{mascota_ID}},\r\n  \"quantity\": 0,\r\n  \"shipDate\": \"{{fechaOrdenMascota}}\",\r\n  \"status\": \"placed\",\r\n  \"complete\": true\r\n}",
+					"options": {
+						"raw": {
+							"language": "json"
+						}
+					}
+				},
+				"url": {
+					"raw": "{{baseURL}}/store/order",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"store",
+						"order"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "LogOut usuarios",
+			"event": [
+				{
+					"listen": "test",
+					"script": {
+						"exec": [
+							"pm.test(\"Validacion LogOut\", function () {\r",
+							"    let respuesta = pm.response.json();\r",
+							"    pm.expect(respuesta.code).to.eql(200);\r",
+							"    pm.expect(pm.response.json()).to.have.property('message');\r",
+							"    pm.expect(respuesta.message).to.equal(\"ok\");\r",
+							"});"
+						],
+						"type": "text/javascript"
+					}
+				}
+			],
+			"request": {
+				"method": "GET",
+				"header": [],
+				"url": {
+					"raw": "{{baseURL}}/user/logout",
+					"host": [
+						"{{baseURL}}"
+					],
+					"path": [
+						"user",
+						"logout"
+					]
+				}
+			},
+			"response": []
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "baseURL",
+			"value": "https://petstore.swagger.io/v2",
+			"type": "string"
+		},
+		{
+			"key": "username",
+			"value": "dbustamanter",
+			"type": "string"
+		},
+		{
+			"key": "firstName",
+			"value": "Diego",
+			"type": "string"
+		},
+		{
+			"key": "lastName",
+			"value": "Bustamante",
+			"type": "string"
+		},
+		{
+			"key": "password",
+			"value": "pass123",
+			"type": "string"
+		}
+	]
+}

@@ -1,0 +1,18 @@
+{
+  "name": "demopostman",
+  "version": "1.0.0",
+  "description": "\u001b[28~proyecto AUT api testing",
+  "main": "runnerPostman.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "dbustamanter",
+  "license": "ISC",
+  "dependencies": {
+    "newman": "^6.0.0",
+    "newman-reporter-allure": "^2.9.2"
+  },
+  "devDependencies": {
+    "allure-commandline": "^2.25.0"
+  }
+}
